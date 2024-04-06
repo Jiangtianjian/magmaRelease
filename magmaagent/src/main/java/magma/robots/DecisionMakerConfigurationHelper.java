@@ -20,10 +20,7 @@ import magma.agent.decision.decisionmaker.impl.challenge.KickChallengeDecisionMa
 import magma.agent.decision.decisionmaker.impl.challenge.PassingChallengeDecisionMaker;
 import magma.agent.decision.decisionmaker.impl.challenge.RunChallengeDecisionMaker;
 import magma.agent.decision.decisionmaker.impl.challenge.RunToBallDecisionMaker;
-import magma.agent.decision.decisionmaker.impl.testing.DoNothingDecisionMaker;
-import magma.agent.decision.decisionmaker.impl.testing.SimpleDecisionMaker;
-import magma.agent.decision.decisionmaker.impl.testing.TrainingDecisionMaker;
-import magma.agent.decision.decisionmaker.impl.testing.TrainingDecisionMaker2;
+import magma.agent.decision.decisionmaker.impl.testing.*;
 import magma.agent.model.thoughtmodel.IRoboCupThoughtModel;
 
 public class DecisionMakerConfigurationHelper
@@ -52,6 +49,8 @@ public class DecisionMakerConfigurationHelper
 		nao.put("KickChallenge", KickChallengeDecisionMaker::new);
 		nao.put("KeepAwayChallenge", KeepAwayChallengeDecisionMaker::new);
 		nao.put("RunToBall", RunToBallDecisionMaker::new);
+		nao.put("TrainKick8m", opt_kick8mDecisionMaker::new);
+
 		nao.put("PassingChallenge", PassingChallengeDecisionMaker::new);
 		NAO_DECISION_MAKERS = Collections.unmodifiableMap(nao);
 

@@ -15,6 +15,8 @@ import magma.agent.model.agentmeta.impl.RoboCupAgentMetaModel;
 import magma.robots.nao.general.agentruntime.NaoComponentFactory;
 import magma.robots.nao.general.agentruntime.PenaltyComponentFactory;
 import magma.robots.nao.model.agentmeta.NaoAgentMetaModel;
+import magma.robots.nao.general.agentruntime.TrainingKick8MComponentFactory;
+
 import magma.robots.nao1.general.agentruntime.Nao1ComponentFactory;
 import magma.robots.nao1.model.agentmeta.Nao1AgentMetaModel;
 import magma.robots.nao2.general.agentruntime.Nao2ComponentFactory;
@@ -48,6 +50,9 @@ public class RobotConfigurationHelper
 		models.put(NaoToeAgentMetaModel.NAME, NaoToeComponentFactory::new);
 		models.put(PenaltyComponentFactory.NAME, PenaltyComponentFactory::new);
 		models.put(NaoGazeboComponentFactory.NAME, NaoGazeboComponentFactory::new);
+
+		// For optimization
+		models.put(TrainingKick8MComponentFactory.NAME, TrainingKick8MComponentFactory::new);
 		ROBOT_MODELS = Collections.unmodifiableMap(models);
 	}
 

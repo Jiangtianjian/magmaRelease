@@ -49,6 +49,8 @@ public class RoboCupClient
 				"playerid", 8, 1, IMagmaConstants.NUMBER_OF_PLAYERS_PER_TEAM, "player ID of the agent");
 		StringArgument serverArgument = new StringArgument("server", IConnectionConstants.SERVER_IP, "server IP");
 		IntegerArgument portArgument = new IntegerArgument("port", IConnectionConstants.AGENT_PORT, 0, "server port");
+		IntegerArgument MonitorportArgument = new IntegerArgument("monitorport", IConnectionConstants.MONITOR_PORT, 0, "MONITOR_PORT");
+
 		StringArgument gameControllerIPArgument =
 				new StringArgument("gameControllerIP", "localhost", "gameController IP");
 		IntegerArgument serverVersionArgument = new IntegerArgument(
@@ -78,6 +80,14 @@ public class RoboCupClient
 		IntegerArgument mixedTeamOutPort = new IntegerArgument("mtOutPort", 12345, 0, "mixed-team sending port");
 		BooleanArgument thinClientArgument = new BooleanArgument("thinClient", "enables the thin client");
 
+
+		// For reading the parameters from file
+		StringArgument inputFileArgument =
+				new StringArgument("inputFile", IMagmaConstants.DEFAULT_Input_file, "name of inputFile");
+
+		StringArgument outFileArgument =
+				new StringArgument("outFile", IMagmaConstants.DEFAULT_Out_file, "name of Out_file");
+
 		new HelpArgument(teamNameArgument, teamIDArgument, playerIDArgument, serverArgument, portArgument,
 				serverVersionArgument, decisionMakerArgument, factoryArgument, roboVizDebugArgument,
 				roboVizServerArgument, roboVizPortArgument, reportStatsArgument, gameControllerIPArgument,
@@ -89,6 +99,7 @@ public class RoboCupClient
 		int playerID = playerIDArgument.parse(args);
 		String server = serverArgument.parse(args);
 		int port = portArgument.parse(args);
+		int monitorport = MonitorportArgument.parse(args);
 		String gameControllerIP = gameControllerIPArgument.parse(args);
 		int serverVersion = serverVersionArgument.parse(args);
 		int fieldVersion = fieldVersionArgument.parse(args);
@@ -103,6 +114,8 @@ public class RoboCupClient
 		int mtInPort = mixedTeamInPort.parse(args);
 		int mtOutPort = mixedTeamOutPort.parse(args);
 		boolean thinClient = thinClientArgument.parse(args);
+		String inputFile =inputFileArgument.parse((args));
+		String outputfile =outFileArgument.parse((args));
 		Argument.endParse(args);
 
 		RoboVizParameters roboVizParams = new RoboVizParameters(roboVizDebug, roboVizServer, roboVizPort, playerID);

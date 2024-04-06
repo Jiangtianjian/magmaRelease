@@ -37,4 +37,10 @@ public interface IMagmaConstants {
 	double DISTANCE_PENALTY_LYING = 3;
 
 	float TIME_DELAY_LYING = 0.5f;
+
+	// Default path to read parameters from file when optimizing
+	String DEFAULT_Input_file = "origin_Params";
+
+	// Default path to output value to file when optimizing
+	String DEFAULT_Out_file = "value";
 }

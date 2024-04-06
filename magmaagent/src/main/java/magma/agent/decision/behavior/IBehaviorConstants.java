@@ -101,6 +101,8 @@ public interface IBehaviorConstants {
 	// Positioning behaviors
 	String ATTACK = "Attack";
 
+	String KICK_OFF = "Kick_off";
+
 	String KICK_CHALLENGE_ATTACK = "KickChallengeAttack";
 
 	String PASSING_CHALLENGE_ATTACK = "PassingChallengeAttack";
