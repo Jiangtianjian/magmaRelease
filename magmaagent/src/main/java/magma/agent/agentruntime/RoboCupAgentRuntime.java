@@ -19,7 +19,7 @@ import magma.agent.model.thoughtmodel.IRoboCupThoughtModel;
 import magma.agent.model.worldmeta.IRoboCupWorldMetaModel;
 import magma.agent.model.worldmodel.IRoboCupWorldModel;
 import magma.util.roboviz.RoboVizDraw;
-
+import magma.util.roboviz.RoboVizPort;
 /**
  * The AgentRuntime is the core orchestrating component in the magma
  * agent-framework.
@@ -52,6 +52,7 @@ public class RoboCupAgentRuntime extends AgentRuntime
 		// meta models
 		agentMetaModel = factory.getAgentMetaModel();
 		worldMetaModel = factory.createWorldMetaModel(params.getServerVersion());
+		RoboVizPort.monitorport=params.getMonitorPort();
 
 		// protocol layer
 		channelManager = factory.createChannelManager(params.getChannelParams());

@@ -34,6 +34,11 @@ public class PlayerParameters
 
 	private final boolean thinClient;
 
+	private String inputFile;
+
+	private String outputfile;
+	private int  monitorport;
+
 	/**
 	 * Instantiates and initializes a new PlayerParameters object
 	 *
@@ -68,6 +73,19 @@ public class PlayerParameters
 	{
 		this(teamname, null, teamID, playerNumber, host, port, serverVersion, factory, decisionMakerName, roboVizParams,
 				reportStats, thinClient);
+	}
+
+	public PlayerParameters(String teamname, byte teamID, int playerNumber, String host,
+							int port,int monitorport, int serverVersion, ComponentFactory factory, String decisionMakerName,
+							RoboVizParameters roboVizParams, boolean reportStats, boolean thinClient,String inputFile, String outputfile)
+	{
+		this(new ChannelParameters(teamname, teamID, playerNumber, host, port), serverVersion, factory,
+				decisionMakerName, reportStats, thinClient);
+		this.inputFile = inputFile;
+		this.outputfile = outputfile;
+		this.roboVizParams = roboVizParams;
+		this.monitorport= monitorport;
+
 	}
 
 	public PlayerParameters(ChannelParameters channelParams, int serverVersion, ComponentFactory factory,
@@ -191,4 +209,6 @@ public class PlayerParameters
 	{
 		return thinClient;
 	}
+
+	public  int getMonitorPort (){return monitorport;}
 }

@@ -121,7 +121,9 @@ public class RoboCupClient
 		RoboVizParameters roboVizParams = new RoboVizParameters(roboVizDebug, roboVizServer, roboVizPort, playerID);
 		ComponentFactory componentFactory = RobotConfigurationHelper.getComponentFactory(factory, playerID, thinClient);
 
-		return new PlayerParameters(teamName, teamID, playerID, server, port, serverVersion, componentFactory,
-				decisionMakerName, roboVizParams, reportStats, thinClient);
+		//return new PlayerParameters(teamName, teamID, playerID, server, port, serverVersion, componentFactory,
+		//		decisionMakerName, roboVizParams, reportStats, thinClient);
+		return new PlayerParameters(teamName, teamID, playerID, server, port,monitorport, serverVersion, componentFactory,
+				decisionMakerName, roboVizParams, reportStats, thinClient, inputFile, outputfile);
 	}
 }

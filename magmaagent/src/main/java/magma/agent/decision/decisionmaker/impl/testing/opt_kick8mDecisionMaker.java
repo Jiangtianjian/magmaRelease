@@ -4,6 +4,7 @@ import hso.autonomy.agent.decision.behavior.BehaviorMap;
 import hso.autonomy.util.geometry.Area2D;
 import hso.autonomy.util.geometry.Pose2D;
 import hso.autonomy.util.properties.PropertyWriter;
+import magma.agent.agentruntime.PlayerParameters;
 import magma.agent.decision.behavior.IBeam;
 import magma.agent.decision.behavior.IBehaviorConstants;
 import magma.agent.decision.decisionmaker.impl.SoccerDecisionMaker;
@@ -12,7 +13,7 @@ import magma.agent.model.thoughtmodel.IRoboCupThoughtModel;
 import magma.agent.model.worldmodel.IBall;
 import magma.util.train_server.ITrainServer;
 import magma.util.train_server.impl.PlayModeParameters;
-import magma.util.train_server.ITrainServer;
+import magma.util.roboviz.RoboVizPort;
 import magma.util.train_server.impl.TrainServer;
 import org.apache.commons.math3.geometry.euclidean.threed.Vector3D;
 
@@ -36,7 +37,7 @@ public class opt_kick8mDecisionMaker extends SoccerDecisionMaker {
         lastballpos = new Vector3D(0,0,0);
         lasttime = 0;
     }
-    protected ITrainServer serverCommands;
+    protected ITrainServer TrainServer;
     private int MovingBufferTime;
     private double kickstartime;
     private double kickBias;
@@ -70,7 +71,7 @@ public class opt_kick8mDecisionMaker extends SoccerDecisionMaker {
         this.MovingBufferTime = 0;
         this.EndBufferTime = 0;
         this.runtime = 0;
-        this.serverCommands = new TrainServer("localhost", 3200);
+        this.TrainServer = new TrainServer("localhost", RoboVizPort.monitorport);
         lastballpos = new Vector3D(0,0,0);
         lasttime = getWorldModel().getGameTime();
         this.fitness = 0;
@@ -116,13 +117,13 @@ public class opt_kick8mDecisionMaker extends SoccerDecisionMaker {
         if (this.RobotCurrentState == State.RESET) {
             this.ResetbufferTime++;
             if (!this.isReset) {
-                this.serverCommands.connect();
-                this.serverCommands.setPlayMode(PlayModeParameters.PlayOn.getName());
+                this.TrainServer.connect();
+                this.TrainServer.setPlayMode(PlayModeParameters.PlayOn.getName());
                 this.resetBallPos = new Vector3D(-9, 0, 0);
-                this.serverCommands.moveBall(this.resetBallPos);
+                this.TrainServer.moveBall(this.resetBallPos);
                 double Rotate = (45 * (this.runtime - 1));
-                this.serverCommands.moveAgent(new Vector3D(-10 - 2f * Math.cos(Rotate), -2f * Math.sin(Rotate), 0.3), true, getWorldModel().getThisPlayer().getID());
-                this.serverCommands.disconnect();
+                this.TrainServer.moveAgent(new Vector3D(-10 - 2f * Math.cos(Rotate), -2f * Math.sin(Rotate), 0.3), true, getWorldModel().getThisPlayer().getID());
+                this.TrainServer.disconnect();
                 this.isReset = true;
                 this.kickdis = 0;
                 this.kickhigh = 0;
