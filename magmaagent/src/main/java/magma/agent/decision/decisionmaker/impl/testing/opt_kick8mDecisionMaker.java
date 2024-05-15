@@ -23,38 +23,40 @@ import java.util.Random;
 import static java.lang.Math.abs;
 
 public class opt_kick8mDecisionMaker extends SoccerDecisionMaker {
-    private  int EvaluateBuffertime;
-    private  int EndBufferTime;
-    protected boolean haveBeamed;
-    private Vector3D resetBallPos;
-    private int ResetbufferTime;
-    private int runtime;
-    private double fitness;
-    private static Vector3D lastballpos;
-    private static double lasttime;
 
     static {
         lastballpos = new Vector3D(0,0,0);
         lasttime = 0;
     }
+
+    public enum Opt_State {
+        RESET,
+        MOVING,
+        CALCULATE_FITNESS,
+        WAIT,
+        DONE
+    }
     protected ITrainServer TrainServer;
+    private  int CalculateTime;
+    private  int WaitTime;
+    protected boolean haveBeamed;
+    private Vector3D resetBallPos;
+    private int CoolTime = 0;
+    private int runtime;
+    private double fitness;
+    private static Vector3D lastballpos;
+    private static double lasttime;
     private int MovingBufferTime;
     private double kickstartime;
     private double kickBias;
     private double kickhigh;
     private double kickdis;
-    public enum State {
-        RESET,
-        MOVING,
-        EVALUATE,
-        END,
-        FINISH
-    }
+
     private double kicktimetake;
     private boolean fallen;
-    private State RobotCurrentState;
+    private Opt_State AgentState;
     boolean isReset;
-    int adjustmentTime;
+    int TimeCost;
     boolean outoftime;
     boolean ballisstop;
 
@@ -62,14 +64,13 @@ public class opt_kick8mDecisionMaker extends SoccerDecisionMaker {
 
     public opt_kick8mDecisionMaker(BehaviorMap behaviors, IRoboCupThoughtModel thoughtModel) {
         super(behaviors, thoughtModel);
-        ResetbufferTime = 0;
         this.isReset = false;
-        this.RobotCurrentState = State.RESET;
-        this.ResetbufferTime = 0;
-        this.EvaluateBuffertime = 0;
-        this.adjustmentTime = 0;
+        this.AgentState = Opt_State.RESET;
+        this.CoolTime = 0;
+        this.CalculateTime = 0;
+        this.TimeCost = 0;
         this.MovingBufferTime = 0;
-        this.EndBufferTime = 0;
+        this.WaitTime = 0;
         this.runtime = 0;
         this.TrainServer = new TrainServer("localhost", RoboVizPort.monitorport);
         lastballpos = new Vector3D(0,0,0);
@@ -82,11 +83,12 @@ public class opt_kick8mDecisionMaker extends SoccerDecisionMaker {
         this.ballisstop=true;
     }
 
+
     @Override
     protected String beamHome() {
         if (!haveBeamed) {
             haveBeamed = true;
-            ((IBeam) behaviors.get(IBehaviorConstants.BEAM_TO_POSITION)).setPose(new Pose2D(-2f, 0.0f));
+            ((IBeam) behaviors.get(IBehaviorConstants.BEAM_TO_POSITION)).setPose(new Pose2D(-10f, 0.0f));
             return IBehaviorConstants.BEAM_TO_POSITION;
         }
         return null;
@@ -114,105 +116,105 @@ public class opt_kick8mDecisionMaker extends SoccerDecisionMaker {
     @Override
     protected String move() {
 
-        if (this.RobotCurrentState == State.RESET) {
-            this.ResetbufferTime++;
+        if (this.AgentState == Opt_State.RESET) {
+            this.CoolTime = this.CoolTime + 1;
             if (!this.isReset) {
+                // Connect to Simspark
                 this.TrainServer.connect();
                 this.TrainServer.setPlayMode(PlayModeParameters.PlayOn.getName());
+
+                // Move the ball back
                 this.resetBallPos = new Vector3D(-9, 0, 0);
                 this.TrainServer.moveBall(this.resetBallPos);
                 double Rotate = (45 * (this.runtime - 1));
+
+                // Move the agent to different places in order to check kick in several conditions
                 this.TrainServer.moveAgent(new Vector3D(-10 - 2f * Math.cos(Rotate), -2f * Math.sin(Rotate), 0.3), true, getWorldModel().getThisPlayer().getID());
                 this.TrainServer.disconnect();
                 this.isReset = true;
+
+                // Init the judgement variables
                 this.kickdis = 0;
                 this.kickhigh = 0;
                 this.kickstartime = getWorldModel().getGameTime();
                 this.kickBias = 0;
                 this.outoftime =false;
                 this.ballisstop = true;
-                this.adjustmentTime = 0;
+                this.TimeCost = 0;
                 this.MovingBufferTime =0;
-                this.EvaluateBuffertime = 0;
+                this.CalculateTime = 0;
             }
-            if (this.ResetbufferTime > 200) {
-                this.RobotCurrentState = State.MOVING;
-                this.ResetbufferTime = 0;
+
+            // Wait for some times before moving
+            if (this.CoolTime > 100) {
+                this.AgentState = Opt_State.MOVING;
+                this.CoolTime = 0;
                 return IBehaviorConstants.ATTACK;
             }
 
-        }else if (this.RobotCurrentState == State.MOVING) {
-            Area2D.Float kickable = new Area2D.Float((double) 0, 0.25d, -0.15d, 0.15d);
-            if (getWorldModel().getThisPlayer().isInsideArea(getWorldModel().getBall().getPosition(), kickable)) {
-                this.adjustmentTime++;
-
-            }
-            if (this.adjustmentTime >350){
-                this.fitness -=5000;
-                this.runtime += 1;
-                this.RobotCurrentState = State.EVALUATE;
-                this.isReset = false;
-                this.outoftime =true;
-                System.out.println("failed");
-            }
-            if (getWorldModel().getBall().getPosition().getX() > -7.5 &&(!isballmoving())) {
-                this.runtime += 1;
-
-                this.kickBias = Math.abs(getWorldModel().getBall().getPosition().getY());
-
-                this.RobotCurrentState = State.EVALUATE;
-                this.kicktimetake = getWorldModel().getGameTime() - this.kickstartime;
-
-                System.out.println("next");
-                return IBehaviorConstants.SWING_ARMS;
-            }
-            if(judgefallen()){
+        } else if (this.AgentState == Opt_State.MOVING) {
+            if(Checkfallen()){
                 this.fallen =true;
             }
 
-            if (getWorldModel().getBall().getPosition().getZ()>kickhigh){kickhigh = getWorldModel().getBall().getPosition().getZ();}
-            if (getWorldModel().getBall().getPosition().distance(resetBallPos)>this.kickdis){this.kickdis=getWorldModel().getBall().getPosition().distance(resetBallPos);}
+            Area2D.Float kickable = new Area2D.Float((double) 0, 0.25d, -0.15d, 0.15d);
+            if (getWorldModel().getThisPlayer().isInsideArea(getWorldModel().getBall().getPosition(), kickable)) {
+                this.TimeCost = this.TimeCost + 1;
+            }
+
+            // Not wait for too long
+            if (this.TimeCost > 350){
+                this.fitness -= 5000;
+                this.runtime += 1;
+                this.AgentState = Opt_State.CALCULATE_FITNESS;
+                this.isReset = false;
+                this.outoftime =true;
+            }
+            if (getWorldModel().getBall().getPosition().getX() > -7 &&(!CheckBallSpeed())) {
+                this.runtime += 1;
+                this.kickBias = Math.abs(getWorldModel().getBall().getPosition().getY());
+                this.AgentState = Opt_State.CALCULATE_FITNESS;
+                this.kicktimetake = getWorldModel().getGameTime() - this.kickstartime;
+                return IBehaviorConstants.SWING_ARMS;
+            }
+
+            // Update the ball position
+            if (getWorldModel().getBall().getPosition().getZ() > kickhigh){
+                kickhigh = getWorldModel().getBall().getPosition().getZ();
+            }
+            if (getWorldModel().getBall().getPosition().distance(resetBallPos) > this.kickdis){
+                this.kickdis=getWorldModel().getBall().getPosition().distance(resetBallPos);
+            }
             return IBehaviorConstants.ATTACK;
-
-        } else if (this.RobotCurrentState == State.EVALUATE) {
-            this.EvaluateBuffertime++;
-
-            IBall ball = getWorldModel().getBall();
-            Vector3D ballpos = ball.getPosition();
+        } else if (this.AgentState == Opt_State.CALCULATE_FITNESS) {
+            this.CalculateTime++;
             if (fallen) {
                 this.fitness -= 500;
             }
-            if (this.EvaluateBuffertime > 150) {
+            if (this.CalculateTime > 150) {
                 if (!this.outoftime) {
                     System.out.println("dis");
                     System.out.println(this.kickdis);
                     if (this.kickdis > 8)
-                        this.fitness += -abs(8 - this.kickdis) * 200 + (50 - this.adjustmentTime) * 2.5 + (1 - kickBias) * 1000 ;
+                        this.fitness += -abs(8 - this.kickdis) * 200 + (50 - this.TimeCost) * 2.5 + (1 - kickBias) * 1000 ;
                     else
-                        this.fitness += -abs(8 - this.kickdis) * 500 + (50 - this.adjustmentTime) * 2.5 + (1 - kickBias) * 1000 ;
+                        this.fitness += -abs(8 - this.kickdis) * 500 + (50 - this.TimeCost) * 2.5 + (1 - kickBias) * 1000 ;
                 }
-                //                try {
-//                    PropertyWriter.saveFitness(fitness);
-//                } catch (IOException e) {
-//                    throw new RuntimeException(e);
-//                }
 
-
-                System.out.println(fitness);
                 if (this.runtime == 20) {
-                    this.RobotCurrentState = State.END;
+                    this.AgentState = Opt_State.WAIT;
                 }
                 else {
-                    this.RobotCurrentState = State.RESET;
+                    this.AgentState = Opt_State.RESET;
                     this.isReset =false;
                 }
             }
-        } else if (this.RobotCurrentState == State.END) {
-            this.EndBufferTime++;
-            if (this.EndBufferTime> 100) {
+        } else if (this.AgentState == Opt_State.WAIT) {
+            this.WaitTime++;
+            if (this.WaitTime > 100) {
                 System.out.println("write");
                 try {
-                    PropertyWriter.saveFitness(this.fitness/20);
+                    PropertyWriter.saveFitness(this.fitness / 20);
                 } catch (IOException e) {
                     throw new RuntimeException(e);
                 }
@@ -220,13 +222,13 @@ public class opt_kick8mDecisionMaker extends SoccerDecisionMaker {
                 this.runtime=0;
                 this.outoftime = false;
                 this.isReset = false;
-                this.RobotCurrentState = State.RESET;
+                this.AgentState = Opt_State.RESET;
                 this.MovingBufferTime = 0;
 
-                this.EvaluateBuffertime = 0;
+                this.WaitTime = 0;
                 this.fallen = false;
             }
-        } else if (this.RobotCurrentState == State.FINISH) {
+        } else if (this.AgentState == Opt_State.DONE) {
             return IBehaviorConstants.SWING_ARMS;
         } else {
             return null;
@@ -236,23 +238,21 @@ public class opt_kick8mDecisionMaker extends SoccerDecisionMaker {
     }
 
 
-    protected boolean isballmoving() {
+    protected boolean Checkfallen(){
+        return getWorldModel().getThisPlayer().getPosition().getZ() < 0.02;
+    }
+
+    protected boolean CheckBallSpeed() {
         double thisTime = getWorldModel().getGameTime();
         Vector3D thisballpos = getWorldModel().getBall().getPosition();
-
-        // Assuming Vector3D has a distance method
-        if (getWorldModel().getBall().getSpeed().getNorm()>0.005) { // Use a significant distance threshold, like 0.01
+        if (getWorldModel().getBall().getSpeed().getNorm()>0.005) {
             lastballpos = thisballpos;
             lasttime = thisTime;
             return true;
-        } else {
-            return false;
         }
+        return false;
+
     }
-    protected boolean judgefallen(){
-        if (getWorldModel().getThisPlayer().getPosition().getZ()<0.02){
-            return  true;
-        }else {return false;}
-    }
+
 
 }
