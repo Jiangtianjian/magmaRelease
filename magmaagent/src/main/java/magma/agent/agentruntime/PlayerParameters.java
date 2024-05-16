@@ -211,4 +211,14 @@ public class PlayerParameters
 	}
 
 	public  int getMonitorPort (){return monitorport;}
+
+	public String getOutputfile()
+	{
+		return outputfile;
+	}
+	public String getInputFile()
+	{
+		return inputFile;
+	}
+
 }

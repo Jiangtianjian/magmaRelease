@@ -268,4 +268,11 @@ public abstract class ComponentFactory implements IBehaviorConstants
 	public abstract IWalkEstimator createWalkEstimator();
 
 	public abstract void loadProperties(int playerNumber);
+
+	public abstract void loadProperties(int playerNumber ,String inputfile);
+
+	public abstract void loadwriteProperties(String outfile);
+
+	public abstract void TabSeparatedProperties(String outfile);
+
 }

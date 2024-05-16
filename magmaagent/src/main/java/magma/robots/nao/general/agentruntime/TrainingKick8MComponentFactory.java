@@ -252,7 +252,6 @@ public class TrainingKick8MComponentFactory extends NaoComponentFactory
 
 	@Override
 	protected ParameterMap createSpecificParameters() {
-		System.out.println("Here we Normal run");
 		ParameterMap result = new ParameterMap();
 
 		result.put(IK_WALK_STEP, new IKWalkMovementParametersBase());

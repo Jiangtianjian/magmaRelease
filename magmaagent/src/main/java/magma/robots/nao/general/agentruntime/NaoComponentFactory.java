@@ -81,6 +81,7 @@ import magma.robots.nao.decision.behavior.movement.kick.Kick8m;
 import magma.robots.nao.decision.behavior.movement.kick.Kick8mParameters;
 import magma.robots.nao.model.agentmeta.NaoAgentMetaModel;
 import magma.robots.nao.model.agentmodel.ik.impl.NaoLegCalculator;
+import hso.autonomy.util.properties.*;
 
 public class NaoComponentFactory extends ComponentFactory
 {
@@ -339,4 +340,22 @@ public class NaoComponentFactory extends ComponentFactory
 	{
 		PropertyManager.load("/properties/common.properties", "/properties/nao/nao.properties");
 	}
+
+
+	@Override
+	public void loadProperties(int playerNumber, String inputfile) {
+		PropertyManager.load("/properties/common.properties", inputfile);
+	}
+
+	@Override
+	public void loadwriteProperties(String outfile) {
+		new PropertyWriter(outfile);
+	}
+
+	@Override
+	public void  TabSeparatedProperties(String inputfile)
+	{
+		TabSeparatedPropertiesUtil.loadProperties(inputfile);
+	}
+
 }

@@ -28,6 +28,8 @@ import magma.agent.model.thoughtmodel.strategy.IRoleManager;
 import magma.agent.model.worldmeta.IRoboCupWorldMetaModel;
 import magma.agent.model.worldmodel.IRoboCupWorldModel;
 import magma.util.roboviz.RoboVizDraw;
+import hso.autonomy.util.properties.PropertyManager;
+import hso.autonomy.util.properties.TabSeparatedPropertiesUtil;
 
 public class ComponentFactoryDecorator extends ComponentFactory
 {
@@ -167,4 +169,21 @@ public class ComponentFactoryDecorator extends ComponentFactory
 	{
 		decoratee.loadProperties(playerNumber);
 	}
+
+	@Override
+	public void loadProperties(int playerNumber, String inputfile) {
+		PropertyManager.load("/properties/common.properties", inputfile);
+	}
+
+	@Override
+	public void loadwriteProperties( String outfile) {
+
+	}
+
+	@Override
+	public void  TabSeparatedProperties(String inputfile)
+	{
+		TabSeparatedPropertiesUtil.loadProperties(inputfile);
+	}
+
 }

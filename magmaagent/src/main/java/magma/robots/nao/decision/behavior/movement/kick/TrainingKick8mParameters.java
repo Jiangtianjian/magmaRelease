@@ -7,7 +7,7 @@ package magma.robots.nao.decision.behavior.movement.kick;
 
 import hso.autonomy.util.properties.TabSeparatedPropertiesUtil;
 import magma.agent.decision.behavior.base.KickDistribution;
-
+import magma.robots.nao.decision.behavior.movement.kick.Kick8mParameters;
 
 public class TrainingKick8mParameters extends Kick8mParameters
 {
@@ -17,8 +17,7 @@ public class TrainingKick8mParameters extends Kick8mParameters
         System.out.println("load8m");
         String key = "Kick8m";
 
-        put(Param.TIME0, TabSeparatedPropertiesUtil.getFloatProperty(key+".TIME0"));
-
+        put(Param.TIME0, TabSeparatedPropertiesUtil.getFloatProperty("Kick8m.TIME0"));
         put(Param.TIME1, TabSeparatedPropertiesUtil.getFloatProperty(key+".TIME1"));
         put(Param.TIME2, TabSeparatedPropertiesUtil.getFloatProperty(key+".TIME2"));
         put(Param.TIME3, TabSeparatedPropertiesUtil.getFloatProperty(key+".TIME3"));
@@ -52,6 +51,7 @@ public class TrainingKick8mParameters extends Kick8mParameters
         put(Param.RUN_TO_Y, TabSeparatedPropertiesUtil.getFloatProperty(key+".RUN_TO_Y"));
         put(Param.CANCEL_DISTANCE,TabSeparatedPropertiesUtil.getFloatProperty(key+".CANCEL_DISTANCE") );
         put(Param.STABILIZE_TIME,TabSeparatedPropertiesUtil.getFloatProperty(key+".STABILIZE_TIME"));
+        System.out.println(Param.TIME0);
         // Average utility: 5.926 averaged: 1000, properties: [
         // ballX: 6.484,
         // ballY: -0.004,

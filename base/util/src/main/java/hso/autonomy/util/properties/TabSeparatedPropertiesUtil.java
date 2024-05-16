@@ -40,6 +40,7 @@ public class TabSeparatedPropertiesUtil {
 
     public static float getFloatProperty(String key) {
         String value = getProperty(key);
+        System.out.println("Tab"+value+" key"+key);
         return value != null ? Float.parseFloat(value) : Float.NaN; // Return NaN if the key doesn't exist
     }
 
