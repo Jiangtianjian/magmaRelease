@@ -1,8 +1,6 @@
 # magmaOffenburg RoboCup 3D simulation code
 
-This software is released under the GPL. See file [gpl.txt](gpl.txt)
- for more information.
-If you use this software please acknowledge it appropriately.
+This software is distributed under the GPL. Please refer to the LICENSE file for further details. Kindly acknowledge the use of this software appropriately.
 
 A tutorial is available on YouTube describing the basics of working with the magmaOffenburg source code:
 https://www.youtube.com/watch?v=_FNaMjJlNfI
